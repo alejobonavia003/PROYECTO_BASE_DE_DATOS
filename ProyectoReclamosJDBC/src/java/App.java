@@ -88,7 +88,7 @@ public class App {
                         System.out.println("INGRESE FECHA DE RECLAMO");
                         String fecha = scanner.nextLine();
                         
-//TODO: solucionar problema de que en ddl le puse unique a id de usuario y este se tiene que poder repetir por que varios usuarios pueden hacer mas de un reclamo 
+                        //TODO: solucionar problema de que en ddl le puse unique a id de usuario y este se tiene que poder repetir por que varios usuarios pueden hacer mas de un reclamo 
                         query = "INSERT INTO Reclamo(fecha_resol, id) VALUES (?, ?)";
                         try {
                             statement = connection.prepareStatement(query);
