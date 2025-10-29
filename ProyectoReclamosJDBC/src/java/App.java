@@ -145,7 +145,23 @@ public class App {
 
                         break;
                     case 3:
-                        //eliminarReclamo(connection, scanner);
+                        System.out.println("Ingrese una ID de reclamo a eliminar");
+                        int idr = scanner.nextInt();
+                        String delete = "Delete from reclamo where id = ?";
+
+                       
+                        try {
+                             statement = connection.prepareStatement(delete);   
+                             statement.setInt(1, idr);
+                             int filas = statement.executeUpdate();
+                            if (filas > 0){
+                                System.out.println("Reclamo eliminado correctamente.");
+                            }else{
+                                System.out.println("No se encontró un reclamo con ese ID.");
+                            }
+                        } catch (SQLException e) {
+                            System.out.println("error al eliminar el reclamo"  + e.getMessage());
+                        }  
                         break;
                     case 0:
                         System.out.println("saliendo del programa...");
@@ -165,3 +181,35 @@ public class App {
     }
     
 }
+
+
+/** a) 
+ * 
+select persona.apellido, persona.nombre, persona.dni, cant_reclamos from persona join (select * from usuario join (select u.id as ud, count(u.nro) as cant_reclamos from reclamo u group by u.id)
+on usuario.id = ud)
+on persona.id = ud;
+ */
+
+/* b)
+SELECT 
+    Reclamo.nro AS nro_reclamo,
+    Reclamo.fecha_resol AS fecha_resolucion,
+    Materiales.codigo AS codigo_material,
+    Materiales.descripcion AS material,
+    Usa.cantidad
+FROM Reclamo
+LEFT JOIN Usa ON Reclamo.nro = Usa.nro
+LEFT JOIN Materiales ON Usa.codigo = Materiales.codigo
+ORDER BY Reclamo.nro;
+
+ */
+
+ /**
+  c) 
+  SELECT deriva.nro,
+    COUNT(DISTINCT deriva.id) AS cantidad_empleados_asignados
+FROM deriva
+GROUP BY deriva.nro
+HAVING COUNT(DISTINCT deriva.id) > 1;
+
+  */
