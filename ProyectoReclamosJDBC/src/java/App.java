@@ -152,3 +152,27 @@ select persona.apellido, persona.nombre, persona.dni, cant_reclamos from persona
 on usuario.id = ud)
 on persona.id = ud;
  */
+
+/* b)
+SELECT 
+    Reclamo.nro AS nro_reclamo,
+    Reclamo.fecha_resol AS fecha_resolucion,
+    Materiales.codigo AS codigo_material,
+    Materiales.descripcion AS material,
+    Usa.cantidad
+FROM Reclamo
+LEFT JOIN Usa ON Reclamo.nro = Usa.nro
+LEFT JOIN Materiales ON Usa.codigo = Materiales.codigo
+ORDER BY Reclamo.nro;
+
+ */
+
+ /**
+  c) 
+  SELECT deriva.nro,
+    COUNT(DISTINCT deriva.id) AS cantidad_empleados_asignados
+FROM deriva
+GROUP BY deriva.nro
+HAVING COUNT(DISTINCT deriva.id) > 1;
+
+  */
