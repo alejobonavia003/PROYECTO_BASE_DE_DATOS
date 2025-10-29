@@ -26,14 +26,15 @@ public class App {
 
     public static void main(String[] args) {
         try (Connection connection = DriverManager.getConnection(url, user, password)) {
+            connection.setAutoCommit(true);
             Scanner scanner = new Scanner(System.in);
 
             int opcion;
 
             do {
                 System.out.println("\n========= MENÚ PRINCIPAL =========");
-                System.out.println("1. Listar reclamos");
-                System.out.println("2. Insertar nuevo reclamo");
+                System.out.println("1. Agregar un usuario");
+                System.out.println("2. Listar reclamos de un usuario");
                 System.out.println("3. Eliminar reclamo por ID");
                 System.out.println("0. Salir");
                 System.out.print("Seleccione una opción: ");
@@ -50,7 +51,8 @@ public class App {
                     case 1:
                         System.out.println("=== INGRESAR UN USUARIO ===");
                         System.out.println("INGRESE EL DNI");
-                        String dni = scanner.nextLine();
+                        int dni = scanner.nextInt();
+                        scanner.nextLine();
                        
                         System.out.println("INGRESE EL NOMBRE");
                         String nombre = scanner.nextLine();
@@ -77,10 +79,10 @@ public class App {
                                 statement = connection.prepareStatement(query2);
                                 resultSet = statement.executeQuery();
                                 if (resultSet.next()) {
-                                    String id = resultSet.getString(1);
+                                    int id = resultSet.getInt(1);
                                     statement = connection.prepareStatement(query);
-                                    statement.setString(1, id);
-                                    statement.setString(2, dni);
+                                    statement.setInt(1, id);
+                                    statement.setInt(2, dni);
                                     statement.setString(3, apellido);
                                     statement.setString(4, nombre);
                                     fila = statement.executeUpdate();
@@ -99,9 +101,10 @@ public class App {
                         }
                         
 
-
+                    break;
                     case 2:
-                    System.out.println("=== LISTA DE USUARIOS (vas a elejir un id)=====");
+                    System.out.println("=== LISTA UN RECLAMO DE UN USUARIOS (vas a elejir un id)=====");
+                    System.out.println("==ELIJE UN USUARIO POR ID======");
                         query = "select * from usuario join persona on usuario.id = persona.id";
                         statement = connection.prepareStatement(query);
                         resultSet = statement.executeQuery();
@@ -110,35 +113,49 @@ public class App {
                             // Quarter
 
                             System.out.print(" ID: " + resultSet.getString(1));
-                            System.out.print("; TEL: " + resultSet.getString(2));
-                            System.out.print("; DIRECCION: " + resultSet.getString(3));
-                            System.out.print("; DNI: " + resultSet.getString(5));
-                            System.out.print("; NOMBRE: " + resultSet.getString(7));
-                            System.out.print("; APELLIDO: " + resultSet.getString(6));
-                            System.out.print("\n   ");
-                           
+                            System.out.print(" TEL: " + resultSet.getString(2));
+                            System.out.print(" DIRECCION: " + resultSet.getString(3));
+                            System.out.print(" DNI: " + resultSet.getString(5));
+                            System.out.print(" NOMBRE: " + resultSet.getString(7));
+                            System.out.print(" APELLIDO: " + resultSet.getString(6));
+                            System.out.print("\n");
                         }
 
-                        System.out.println("ELIJE UN ID DE PERSONA PARA ASIGNAR UN RECLAMO");
+                        System.out.println("ELIJE UN ID DE USUARIO");
                         int id = scanner.nextInt();
                         scanner.nextLine();
-                        System.out.println("INGRESE FECHA DE RECLAMO");
-                        String fecha = scanner.nextLine();
-                        
-                        //TODO: solucionar problema de que en ddl le puse unique a id de usuario y este se tiene que poder repetir por que varios usuarios pueden hacer mas de un reclamo 
-                        query = "INSERT INTO Reclamo(fecha_resol, id) VALUES (?, ?)";
+
                         try {
+                        String usuario = "";
+                        query = "select apellido from  persona where id = ?";
+                        statement = connection.prepareStatement(query);
+                        statement.setInt(1, id);
+                        resultSet = statement.executeQuery();
+                        if (resultSet.next()) {  
+                            usuario = resultSet.getString("apellido");
+                        } else {
+                            System.out.println("NO SE ENCONTRO UN USUARIO CON ESE ID");
+                            return;
+                        }
+
+                        query = "SELECT r.nro as numero_de_reclamo, r.fecha_resol as fecha_de_resolucion, COUNT(l.numero) as cantidad_de_rellamados FROM Reclamo r LEFT JOIN Llamado l ON r.nro = l.nro WHERE r.id = ? GROUP BY r.nro, r.fecha_resol ORDER BY r.nro;";
+                        
                             statement = connection.prepareStatement(query);
-                            statement.setString(1, fecha);
-                            statement.setInt(2, id);
-                            int filas = statement.executeUpdate();
-                            if (filas > 0) {
-                                System.out.println("eclamo agregado");
+                            statement.setInt(1, id);
+                            resultSet = statement.executeQuery();
+                            System.out.println("LISTADO DE RECLAMOS DEL USUARIO "+usuario+".");
+
+                            if(!resultSet.next()){
+                                System.out.println("NO HAY RECLAMOS PARA ESTE USUARIO");
                             } else {
-                                System.out.println("no se pudo agregar el reclamo");
+                                do {
+                                    System.out.print(" NRO DE RECLAMO: " + resultSet.getString(1));
+                                    System.out.print(" FECHA DE RESOLUCION: " + resultSet.getString(2));
+                                    System.out.print("\n");
+                                } while(resultSet.next());
                             }
                         } catch (SQLException e) {
-                            System.out.println("error al agregar reclamo: " + e.getMessage());
+                            System.out.println("error al listar un reclamo: " + e.getMessage());
                         }
 
 
@@ -152,16 +169,16 @@ public class App {
                         resultSet = statement.executeQuery();
 
                         while(resultSet.next()){
-                            System.out.println("Nro_Reclamo: " + resultSet.getNString(1));
-                            System.out.println("Fecha_Resolucion: " + resultSet.getNString(2));
-                            System.out.println("ID_Usuario: " + resultSet.getNString(3));
+                            System.out.println("Nro_Reclamo: " + resultSet.getString(1));
+                            System.out.println("Fecha_Resolucion: " + resultSet.getString(2));
+                            System.out.println("ID_Usuario: " + resultSet.getString(3));
                             System.out.println(" \n");
 
                         }
 
-                        System.out.println("Ingrese una ID de reclamo a eliminar");
+                        System.out.println("Ingrese un NRO de reclamo a eliminar");
                         int idr = scanner.nextInt();
-                        String delete = "Delete from reclamo where id = ?";
+                        String delete = "Delete from reclamo where nro = ?";
 
                        
                         try {
@@ -171,7 +188,7 @@ public class App {
                             if (filas > 0){
                                 System.out.println("Reclamo eliminado correctamente.");
                             }else{
-                                System.out.println("No se encontró un reclamo con ese ID.");
+                                System.out.println("No se encontró un reclamo con ese NRO.");
                             }
                         } catch (SQLException e) {
                             System.out.println("error al eliminar el reclamo"  + e.getMessage());
@@ -204,19 +221,6 @@ on usuario.id = ud)
 on persona.id = ud;
  */
 
-/* b)
-SELECT 
-    Reclamo.nro AS nro_reclamo,
-    Reclamo.fecha_resol AS fecha_resolucion,
-    Materiales.codigo AS codigo_material,
-    Materiales.descripcion AS material,
-    Usa.cantidad
-FROM Reclamo
-LEFT JOIN Usa ON Reclamo.nro = Usa.nro
-LEFT JOIN Materiales ON Usa.codigo = Materiales.codigo
-ORDER BY Reclamo.nro;
-
- */
 
  /**
   c) 
