@@ -145,7 +145,8 @@ public class App {
 
                         break;
                     case 3:
-                        System.out.println("LISTA DE RECLAMOS/n");
+                        
+                    System.out.println("LISTA DE RECLAMOS/n");
                         query = "select * from reclamo";
                         statement = connection.prepareStatement(query);
                         resultSet = statement.executeQuery();
@@ -157,6 +158,7 @@ public class App {
                             System.out.println(" \n");
 
                         }
+
                         System.out.println("Ingrese una ID de reclamo a eliminar");
                         int idr = scanner.nextInt();
                         String delete = "Delete from reclamo where id = ?";
