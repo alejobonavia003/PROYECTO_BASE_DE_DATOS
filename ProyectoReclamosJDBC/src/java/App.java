@@ -108,7 +108,23 @@ public class App {
 
                         break;
                     case 3:
-                        //eliminarReclamo(connection, scanner);
+                        System.out.println("Ingrese una ID de reclamo a eliminar");
+                        int idr = scanner.nextInt();
+                        String delete = "Delete from reclamo where id = ?";
+
+                       
+                        try {
+                             statement = connection.prepareStatement(delete);   
+                             statement.setInt(1, idr);
+                             int filas = statement.executeUpdate();
+                            if (filas > 0){
+                                System.out.println("Reclamo eliminado correctamente.");
+                            }else{
+                                System.out.println("No se encontró un reclamo con ese ID.");
+                            }
+                        } catch (SQLException e) {
+                            System.out.println("error al eliminar el reclamo"  + e.getMessage());
+                        }  
                         break;
                     case 0:
                         System.out.println("saliendo del programa...");
