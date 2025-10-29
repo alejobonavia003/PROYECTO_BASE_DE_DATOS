@@ -144,3 +144,11 @@ public class App {
     }
     
 }
+
+
+/** a) 
+ * 
+select persona.apellido, persona.nombre, persona.dni, cant_reclamos from persona join (select * from usuario join (select u.id as ud, count(u.nro) as cant_reclamos from reclamo u group by u.id)
+on usuario.id = ud)
+on persona.id = ud;
+ */
