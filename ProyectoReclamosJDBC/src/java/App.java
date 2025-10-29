@@ -116,7 +116,7 @@ public class App {
                             System.out.print("; NOMBRE: " + resultSet.getString(7));
                             System.out.print("; APELLIDO: " + resultSet.getString(6));
                             System.out.print("\n   ");
-                            //System.out.print("\n   ");
+                           
                         }
 
                         System.out.println("ELIJE UN ID DE PERSONA PARA ASIGNAR UN RECLAMO");
@@ -145,6 +145,18 @@ public class App {
 
                         break;
                     case 3:
+                        System.out.println("LISTA DE RECLAMOS/n");
+                        query = "select * from reclamo";
+                        statement = connection.prepareStatement(query);
+                        resultSet = statement.executeQuery();
+
+                        while(resultSet.next()){
+                            System.out.println("Nro_Reclamo: " + resultSet.getNString(1));
+                            System.out.println("Fecha_Resolucion: " + resultSet.getNString(2));
+                            System.out.println("ID_Usuario: " + resultSet.getNString(3));
+                            System.out.println(" \n");
+
+                        }
                         System.out.println("Ingrese una ID de reclamo a eliminar");
                         int idr = scanner.nextInt();
                         String delete = "Delete from reclamo where id = ?";
