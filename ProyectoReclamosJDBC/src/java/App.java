@@ -48,21 +48,58 @@ public class App {
 
                 switch (opcion) {
                     case 1:
-                        query = "SELECT * FROM reclamo ";
-                        statement = connection.prepareStatement(query);
-                        resultSet = statement.executeQuery();
-                              // Print results.
-                        while(resultSet.next()) {
-                            // Quarter
-                            //TODO: aca tenemos que hacer algunos join 
-                            //TODO: y listar bien la informacion del reclamo como persona deriva etc
-                            System.out.print(" NRO: " + resultSet.getString(1));
-                            System.out.print("; FECHA_RESOL: " + resultSet.getString(2));
-                            System.out.print("; ID: " + resultSet.getString(3)) ;
-                            System.out.print("\n   ");
-                            //System.out.print("\n   ");
+                        System.out.println("=== INGRESAR UN USUARIO ===");
+                        System.out.println("INGRESE EL DNI");
+                        String dni = scanner.nextLine();
+                       
+                        System.out.println("INGRESE EL NOMBRE");
+                        String nombre = scanner.nextLine();
+
+                        System.out.println("INGRESE EL APELLIDO");
+                        String apellido = scanner.nextLine();
+
+                        System.out.println("INGRESE EL TELEFONO");
+                        String tel = scanner.nextLine();
+
+                        System.out.println("INGRESE LA DIRECCION");
+                        String direccion = scanner.nextLine();
+                        query = "INSERT INTO Usuario(tel, direccion) VALUES (?, ?)";
+                        try {
+                            statement = connection.prepareStatement(query);
+                            statement.setString(1, tel);
+                            statement.setString(2, direccion);
+                            int fila = statement.executeUpdate();
+                            if(fila <= 0){
+                                System.out.println("Error al cargar el usuario");
+                            }else{
+                                query = "INSERT INTO Persona(id, dni, apellido, nombre) VALUES (?, ?, ?, ?)";
+                                String query2 = "SELECT id FROM Usuario ORDER BY id DESC LIMIT 1";
+                                statement = connection.prepareStatement(query2);
+                                resultSet = statement.executeQuery();
+                                if (resultSet.next()) {
+                                    String id = resultSet.getString(1);
+                                    statement = connection.prepareStatement(query);
+                                    statement.setString(1, id);
+                                    statement.setString(2, dni);
+                                    statement.setString(3, apellido);
+                                    statement.setString(4, nombre);
+                                    fila = statement.executeUpdate();
+                                    if(fila <= 0){
+                                        System.out.println("Error al cargar la informacion personal");
+                                    }
+                                    else{
+                                        System.out.println("Usuario agregado exitosamente");
+                                    }
+                                }else{
+                                    System.out.println("Error al encontrar el id");
+                                }
+                            }                           
+                        } catch (SQLException e) {
+                            System.out.println("error al agregar el usuario: " + e.getMessage());
                         }
-                        break;
+                        
+
+
                     case 2:
                     System.out.println("=== LISTA DE USUARIOS (vas a elejir un id)=====");
                         query = "select * from usuario join persona on usuario.id = persona.id";
