@@ -151,6 +151,7 @@ public class App {
                                 do {
                                     System.out.print(" NRO DE RECLAMO: " + resultSet.getString(1));
                                     System.out.print(" FECHA DE RESOLUCION: " + resultSet.getString(2));
+                                    System.out.print(" CANTIDAD DE RELLAMADOS: " + resultSet.getString(3));
                                     System.out.print("\n");
                                 } while(resultSet.next());
                             }

@@ -20,8 +20,8 @@ FOREIGN KEY (id) REFERENCES Usuario (id),
 PRIMARY KEY (id));
 
 CREATE TABLE Persona(
- id serial UNIQUE NOT NULL,
- dni integer,
+ id serial NOT NULL,
+ dni integer UNIQUE,
  apellido varchar(50),
  nombre varchar(50),
  CONSTRAINT dniper CHECK (dni > 0 AND dni < 1000000000), 
@@ -65,21 +65,28 @@ FOREIGN KEY (codigo) REFERENCES Materiales (codigo),
 FOREIGN KEY (nro) REFERENCES Reclamo (nro) ON DELETE CASCADE,
 PRIMARY KEY (codigo,nro));
 
-CREATE TABLE auditoria(
- id_auditoria serial PRIMARY KEY,
- nro_reclamo_eliminado integer NOT NULL,
- fecha_eliminacion timestamp DEFAULT CURRENT_TIMESTAMP,
- usuario_id integer,
- fecha_resol_reclamo varchar(50)
+
+CREATE TABLE auditoria (
+    id_auditoria SERIAL PRIMARY KEY,
+    nro_reclamo_eliminado INTEGER NOT NULL,
+    fecha_eliminacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usuario_id INTEGER,
+    fecha_resol_reclamo VARCHAR(50),
+    eliminado_por VARCHAR(100) -- <--- nuevo campo para el usuario de PostgreSQL
 );
 
-CREATE function funcion_auditoria() returns trigger as $$
-begin insert into auditoria(nro_reclamo_eliminado, usuario_id, fecha_resol_reclamo) 
-values(old.nro, old.id , old.fecha_resol);
-return old;
-end; 
+CREATE OR REPLACE FUNCTION funcion_auditoria()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO auditoria(nro_reclamo_eliminado, usuario_id, fecha_resol_reclamo, eliminado_por)
+    VALUES (OLD.nro, OLD.id, OLD.fecha_resol, current_user);
+    RETURN OLD;
+END;
 $$ LANGUAGE plpgsql;
 
-create trigger trigger_auditoria after delete on reclamo for each row
-execute procedure funcion_auditoria();
+
+CREATE TRIGGER trigger_auditoria
+AFTER DELETE ON reclamo
+FOR EACH ROW
+EXECUTE FUNCTION funcion_auditoria();
 
