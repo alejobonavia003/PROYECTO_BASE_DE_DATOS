@@ -103,8 +103,8 @@ public class App {
 
                     break;
                     case 2:
-                    System.out.println("=== LISTA UN RECLAMO DE UN USUARIOS (vas a elejir un id)=====");
-                    System.out.println("==ELIJE UN USUARIO POR ID======");
+                    System.out.println("=== LISTA UN RECLAMO DE UN USUARIOS (vas a elegir un id)=====");
+                    System.out.println("==ELIGE UN USUARIO POR ID======");
                         query = "select * from usuario join persona on usuario.id = persona.id";
                         statement = connection.prepareStatement(query);
                         resultSet = statement.executeQuery();
@@ -161,6 +161,7 @@ public class App {
 
 
                         break;
+                        
                     case 3:
                         
                     System.out.println("LISTA DE RECLAMOS/n");
